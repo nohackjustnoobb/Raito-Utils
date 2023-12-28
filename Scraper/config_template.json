@@ -1,0 +1,6 @@
+{
+    "driver": "driverID",
+    "proxies": [
+        "proxyIP"
+    ]
+}
