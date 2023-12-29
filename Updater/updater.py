@@ -76,14 +76,28 @@ def save_manga(manga: Manga):
     )
     conn.commit()
 
+    # delete the existing chapter
+    cursor.execute("DELETE FROM CHAPTER WHERE CHAPTERS_ID = ?", (manga.id,))
+    conn.commit
+
     # save the chapter
     cursor.executemany(
-        "REPLACE INTO CHAPTER (CHAPTERS_ID, ID, TITLE, IS_EXTRA) VALUES (?, ?, ?, ?)",
-        list(map(lambda x: (manga.id, x.id, x.title, True), manga.chapters.extra)),
+        "REPLACE INTO CHAPTER (CHAPTERS_ID, ID, IDX, TITLE, IS_EXTRA) VALUES (?, ?, ?, ?, ?)",
+        list(
+            map(
+                lambda x: (manga.id, x[1].id, x[0], x[1].title, True),
+                enumerate(reversed(manga.chapters.extra)),
+            )
+        ),
     )
     cursor.executemany(
-        "REPLACE INTO CHAPTER (CHAPTERS_ID, ID, TITLE, IS_EXTRA) VALUES (?, ?, ?, ?)",
-        list(map(lambda x: (manga.id, x.id, x.title, False), manga.chapters.serial)),
+        "REPLACE INTO CHAPTER (CHAPTERS_ID, ID, IDX, TITLE, IS_EXTRA) VALUES (?, ?, ?, ?, ?)",
+        list(
+            map(
+                lambda x: (manga.id, x[1].id, x[0], x[1].title, False),
+                enumerate(reversed(manga.chapters.serial)),
+            )
+        ),
     )
     conn.commit()
 

@@ -76,7 +76,7 @@ def save_manga(manga: Manga):
 
     # save the manga
     cursor.execute(
-        "INSERT INTO MANGA (ID, THUMBNAIL, TITLE, DESCRIPTION, IS_END, AUTHORS, CATEGORIES, LATEST, UPDATE_TIME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "REPLACE INTO MANGA (ID, THUMBNAIL, TITLE, DESCRIPTION, IS_END, AUTHORS, CATEGORIES, LATEST, UPDATE_TIME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
         (
             manga.id,
             manga.thumbnail,
@@ -94,19 +94,33 @@ def save_manga(manga: Manga):
 
     # save the chapters
     cursor.execute(
-        "INSERT INTO CHAPTERS (MANGA_ID, EXTRA_DATA) VALUES (?, ?)",
+        "REPLACE INTO CHAPTERS (MANGA_ID, EXTRA_DATA) VALUES (?, ?)",
         (manga.id, manga.chapters.extra_data),
     )
     conn.commit()
 
+    # delete the existing chapter
+    cursor.execute("DELETE FROM CHAPTER WHERE CHAPTERS_ID = ?;", (manga.id,))
+    conn.commit
+
     # save the chapter
     cursor.executemany(
-        "INSERT INTO CHAPTER (CHAPTERS_ID, ID, TITLE, IS_EXTRA) VALUES (?, ?, ?, ?)",
-        list(map(lambda x: (manga.id, x.id, x.title, True), manga.chapters.extra)),
+        "REPLACE INTO CHAPTER (CHAPTERS_ID, ID, IDX, TITLE, IS_EXTRA) VALUES (?, ?, ?, ?, ?)",
+        list(
+            map(
+                lambda x: (manga.id, x[1].id, x[0], x[1].title, True),
+                enumerate(reversed(manga.chapters.extra)),
+            )
+        ),
     )
     cursor.executemany(
-        "INSERT INTO CHAPTER (CHAPTERS_ID, ID, TITLE, IS_EXTRA) VALUES (?, ?, ?, ?)",
-        list(map(lambda x: (manga.id, x.id, x.title, False), manga.chapters.serial)),
+        "REPLACE INTO CHAPTER (CHAPTERS_ID, ID, IDX, TITLE, IS_EXTRA) VALUES (?, ?, ?, ?, ?)",
+        list(
+            map(
+                lambda x: (manga.id, x[1].id, x[0], x[1].title, False),
+                enumerate(reversed(manga.chapters.serial)),
+            )
+        ),
     )
     conn.commit()
 
@@ -167,7 +181,7 @@ while consecutive_failures < 5:
                 if result != None:
                     save_manga(result)
                     consecutive_failures = 0
-            except:
+            except IndexError:
                 error(result.id)
 
     save_state()
