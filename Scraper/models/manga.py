@@ -39,7 +39,7 @@ class Manga:
         "Hentai",
         "Mecha",
         "Restricted",
-        "CrossDressing",
+        "Otokonoko",
     ]
     id: str
     thumbnail: str
