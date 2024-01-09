@@ -1,3 +1,3 @@
-# Better-Manga-Utils
+# Raito-Utils
 
-A collection of utility programs for Better-Manga-App.
+A collection of utility programs for Raito-Manga.
