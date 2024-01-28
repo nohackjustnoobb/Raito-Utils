@@ -1,0 +1,18 @@
+{
+    "fromEmail": "myemail@example.com",
+    "fromPassword": "password",
+    "fromEndpoint": {
+        "authScheme": "Token",
+        "token": "http://old.example.com/token",
+        "collection": "http://old.example.com/collections",
+        "history": "http://old.example.com/histories"
+    },
+    "toEmail": "myemail@example.com",
+    "toPassword": "password",
+    "toEndpoint": {
+        "authScheme": "Bearer",
+        "token": "http://new.example.com/token",
+        "collection": "http://new.example.com/collections",
+        "history": "http://new.example.com/history"
+    }
+}
