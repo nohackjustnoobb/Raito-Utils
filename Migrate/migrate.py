@@ -8,6 +8,7 @@ with open("config.json", "r") as file:
 
 
 # obtain token
+print("Obtaining source token...")
 fromToken = requests.post(
     config["fromEndpoint"]["token"],
     json={
@@ -17,7 +18,7 @@ fromToken = requests.post(
 ).json()["token"]
 fromToken = f"{config['fromEndpoint']['authScheme']} {fromToken}"
 
-
+print("Obtaining destination token...")
 toToken = requests.post(
     config["toEndpoint"]["token"],
     json={
@@ -29,9 +30,11 @@ toToken = f"{config['toEndpoint']['authScheme']} {toToken}"
 
 
 # migrate collections
+print("Fetching source collections...")
 fromCollection = requests.get(
     config["fromEndpoint"]["collection"], headers={"Authorization": fromToken}
 ).json()
+print("Uploading to destination...")
 requests.post(
     config["toEndpoint"]["collection"],
     json=fromCollection,
@@ -40,6 +43,7 @@ requests.post(
 
 
 # migrate history
+print("Fetching source history...")
 fromHistory = []
 page = 1
 while True:
@@ -53,8 +57,12 @@ while True:
     page += 1
     if resp.headers["Is-Next"] == "0":
         break
+
+print("Uploading to destination...")
 requests.post(
     config["toEndpoint"]["history"],
     json=fromHistory,
     headers={"Authorization": toToken},
 )
+
+print("Done migrating")
