@@ -2,4 +2,5 @@
 config.json
 data
 
+**.sqlite3
 **/__pycache__
