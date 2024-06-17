@@ -145,26 +145,30 @@ def fetch(proxy):
         if len(waiting_list) != 0:
             id = waiting_list.pop(0)
         else:
-            chapter = ChapterModel.get(ChapterModel.urls.is_null())
-            id = [chapter.manga.id, chapter.id, chapter.manga.extra_data]
-
-    if isinstance(id, list):
-        print(f"Fetching: {id[1]} from {id[0]}")
-    else:
-        print(f"Fetching: {id}")
+            try:
+                chapter = ChapterModel.get(ChapterModel.urls.is_null())
+                id = [chapter.manga.id, chapter.id, chapter.manga.extra_data]
+            except:
+                id = None
 
     result = None
-    try:
+    if id != None:
         if isinstance(id, list):
-            result = [
-                id[0],
-                id[1],
-                driver.get_chapter(id[1], id[2], proxy),
-            ]
+            print(f"Fetching: {id[1]} from {id[0]}")
         else:
-            result = driver.get(id, proxy)
-    except:
-        error(id)
+            print(f"Fetching: {id}")
+
+        try:
+            if isinstance(id, list):
+                result = [
+                    id[0],
+                    id[1],
+                    driver.get_chapter(id[1], id[2], proxy),
+                ]
+            else:
+                result = driver.get(id, proxy)
+        except:
+            error(id)
 
     return result
 

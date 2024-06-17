@@ -42,7 +42,11 @@ def packed(functionFrame, a, c, data):
         d[e(c)] = e(c) if data[c] == "" else data[c]
         c -= 1
     pieces = re.split(r"(\b\w+\b)", functionFrame)
-    js = "".join([d[x] if x in d else x for x in pieces]).replace("\\'", "'")
+    js = (
+        "".join([d[x] if x in d else x for x in pieces])
+        .replace("\\'", "'")
+        .replace('\\"', '"')
+    )
     return json.loads(re.search(r"^.*\((\{.*\})\).*$", js).group(1))
 
 
