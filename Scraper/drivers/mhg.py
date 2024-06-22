@@ -5,6 +5,7 @@ import lzstring
 import time
 import re
 
+
 from models.driver import Driver
 from models.manga import *
 
@@ -18,15 +19,18 @@ def get(url, proxy):
             timeout=5,
             proxies={"https": proxy},
         )
+
+        m = re.match(r"^.*\}\(\'(.*)\',(\d*),(\d*),\'([\w|\+|\/|=]*)\'.*$", res.text)
+
+        return packed(
+            m.group(1),
+            int(m.group(2)),
+            int(m.group(3)),
+            lz.decompressFromBase64(m.group(4)).split("|"),
+        )
+
     except:
         return False
-    m = re.match(r"^.*\}\(\'(.*)\',(\d*),(\d*),\'([\w|\+|\/|=]*)\'.*$", res.text)
-    return packed(
-        m.group(1),
-        int(m.group(2)),
-        int(m.group(3)),
-        lz.decompressFromBase64(m.group(4)).split("|"),
-    )
 
 
 # parse.py
@@ -187,12 +191,14 @@ class MHG(Driver):
 
     def get_chapter(self, id, extra_data, proxy):
         details = get(f"https://tw.manhuagui.com/comic/{extra_data}/{id}.html", proxy)
+        if not details:
+            return None
+
         urls = list(
             map(
                 lambda x: f"https://i.hamreus.com{details['path']}{x}", details["files"]
             )
         )
-
         return urls
 
     def is_same(self, val1, val2):
