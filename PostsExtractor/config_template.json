@@ -1,0 +1,26 @@
+{
+    "title": [
+        {
+            // Optional, The position of the title in the post
+            // Default: 0
+            "position": 0,
+            // Optional, Regular expression to match the title
+            // Default: (.*)
+            "regex": "(.*)",
+            // Optional, Template for formatting the title
+            // Default: "{}"
+            "template": "{}"
+        }
+    ],
+    "upload": {
+        // Required, URL of the upload endpoint
+        "address": "https://example.com/admin/",
+        // Optional, Access key for authentication
+        // Default: None
+        "accessKey": "exampleKey",
+        // Required, ID of the manga to which the posts belong
+        "mangaId": "1",
+        // Required, Boolean indicating whether the post is extra chapters
+        "isExtra": false
+    }
+}

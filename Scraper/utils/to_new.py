@@ -11,8 +11,6 @@ from models.manga import ChapterModel, Manga, MangaModel, Chapters, Chapter
 
 # initialize database
 filename = input("Filename: ")
-if not filename:
-    filename = "MHG.sqlite3"
 old = sqlite3.connect("./utils/" + filename)
 cursor = old.cursor()
 

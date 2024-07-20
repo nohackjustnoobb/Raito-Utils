@@ -39,6 +39,7 @@ db = init_db(db_config)
 
 # global variables
 waiting_list = []
+failed = []
 thread_lock = threading.Lock()
 
 json_path = f"data/{driver.identifier}.json"
@@ -47,6 +48,7 @@ if os.path.exists(json_path):
         state = json.load(file)
     if state["mode"] == "update":
         waiting_list = state["waitingList"]
+        failed = state["failed"]
 
 
 # helper functions
@@ -57,6 +59,7 @@ def save_state():
             {
                 "mode": "update",
                 "waitingList": waiting_list,
+                "failed": failed,
             },
             file,
         )
@@ -131,6 +134,7 @@ def error(id):
     global waiting_list, thread_lock
 
     if isinstance(id, list):
+        failed.append(id[:-1])
         print(f"Error: {id[1]} from {id[0]}")
     else:
         print(f"Error: {id}")
@@ -146,9 +150,28 @@ def fetch(proxy):
             id = waiting_list.pop(0)
         else:
             try:
-                chapter = ChapterModel.get(ChapterModel.urls.is_null())
-                id = [chapter.manga.id, chapter.id, chapter.manga.extra_data]
-            except:
+                offset = 0
+                while True:
+                    chapter = (
+                        ChapterModel.select()
+                        .where(ChapterModel.urls.is_null())
+                        .limit(1)
+                        .offset(offset)
+                        .get()
+                    )
+
+                    found = False
+                    for i in failed:
+                        if i[0] == chapter.manga.id and i[1] == chapter.id:
+                            found = True
+                            break
+
+                    if not found:
+                        id = [chapter.manga.id, chapter.id, chapter.manga.extra_data]
+                        break
+
+                    offset += 1
+            except KeyboardInterrupt:
                 id = None
 
     result = None

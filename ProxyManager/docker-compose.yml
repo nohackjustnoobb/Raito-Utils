@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  scraper:
+    build:
+      context: .
+    restart: unless-stopped
+    volumes:
+      - ./config.json:/app/config.json
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 11080-11100:11080-11100

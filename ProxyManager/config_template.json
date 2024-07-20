@@ -1,0 +1,21 @@
+{
+    // Required, links to test if the proxy is working
+    "testLinks": [
+        "http://example.com"
+    ],
+    // Required, proxies information
+    "proxies": [
+        {
+            // Required, the proxy address
+            "address": "socks5://proxy.example.com:1080",
+            // Optional, the command to restart the proxy
+            "restartCMD": "docker restart example_proxy"
+        }
+    ],
+    // Optional, set log level to debug
+    "debug": true,
+    // Optional, set the maximum timeout for the second select
+    "secondaryTimeout": 1.5,
+    // Optional, set the maximum timeout for the remaining select
+    "primaryTimeout": 10
+}
