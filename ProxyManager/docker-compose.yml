@@ -1,7 +1,7 @@
 version: "3"
 
 services:
-  scraper:
+  proxy-manager:
     build:
       context: .
     restart: unless-stopped

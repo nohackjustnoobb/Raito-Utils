@@ -47,6 +47,7 @@ services:
             - SURFSHARK_USER={username}
             - SURFSHARK_PASSWORD={password}
             - SURFSHARK_COUNTRY={country}
+            - SURFSHARK_CITY={city}
             - LAN_NETWORK=10.0.0.0/16
         cap_add:
             - NET_ADMIN
