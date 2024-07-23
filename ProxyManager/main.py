@@ -243,9 +243,6 @@ class Proxy:
 
     def try_restart(self):
         while True:
-            # test is the proxy working
-            if self.test():
-                break
 
             # restart the proxy
             if self.restartCMD:
@@ -259,6 +256,10 @@ class Proxy:
                     logger.error(
                         f"{self.host}:{self.port} failed to restart: {result.stderr}"
                     )
+
+            # test is the proxy working
+            if self.test():
+                break
 
             # timeout
             time.sleep(10)
