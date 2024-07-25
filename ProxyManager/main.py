@@ -243,6 +243,11 @@ class Proxy:
 
     def try_restart(self):
         while True:
+            global testLinks
+
+            # test is the proxy working
+            if len(testLinks) != 0 and self.test():
+                break
 
             # restart the proxy
             if self.restartCMD:
@@ -257,8 +262,7 @@ class Proxy:
                         f"{self.host}:{self.port} failed to restart: {result.stderr}"
                     )
 
-            # test is the proxy working
-            if self.test():
+            if len(testLinks) == 0:
                 break
 
             # timeout
@@ -275,6 +279,7 @@ class Proxy:
             return False
 
     def test(self):
+        global testLinks
         return False not in set(map(self.test_link, testLinks))
 
 

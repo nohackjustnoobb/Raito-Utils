@@ -40,6 +40,7 @@ db = init_db(db_config)
 # global variables
 waiting_list = []
 failed = []
+failed_count = {}
 thread_lock = threading.Lock()
 
 json_path = f"data/{driver.identifier}.json"
@@ -130,70 +131,99 @@ def check(manga: PreviewManga):
             waiting_list.append(manga.id)
 
 
-def error(id):
-    global waiting_list, thread_lock
+class FetchObject:
+    type: str
+    id: tuple | str
+    result: object = None
 
-    if isinstance(id, list):
-        failed.append(id[:-1])
-        print(f"Error: {id[1]} from {id[0]}")
-    else:
-        print(f"Error: {id}")
-        with thread_lock:
-            waiting_list.append(id)
+    def __init__(self, type, id):
+        self.type = type
+        self.id = id
+
+    def save(self):
+        if self.result is None:
+            return
+
+        if self.type == "manga":
+            save_manga(self.result)
+        else:
+            save_chapter(self.id[0], self.id[1], self.result)
+
+            key = ".".join(self.id[:-1])
+            if failed_count.get(key) is not None:
+                del failed_count[key]
+
+    def fetch(self, proxy):
+        if self.type == "manga":
+            print(f"Fetching: {self.id}")
+            self.result = driver.get(self.id, proxy)
+        else:
+            print(f"Fetching: {self.id[1]} from {self.id[0]}")
+            self.result = driver.get_chapter(self.id[1], self.id[2], proxy)
+
+        if self.result is None:
+            raise
+
+    def error(self):
+        global thread_lock
+        if self.type == "manga":
+            print(f"Error: {self.id}")
+            global waiting_list
+            with thread_lock:
+                waiting_list.append(self.id)
+        else:
+            print(f"Error: {self.id[1]} from {self.id[0]}")
+            global failed_count
+            key = ".".join(self.id[:-1])
+            with thread_lock:
+                if failed_count.get(key) is None:
+                    failed_count[key] = 0
+                failed_count[key] += 1
+
+                if failed_count[key] >= 5:
+                    del failed_count[key]
+                    failed.append(self.id[:-1])
 
 
 def fetch(proxy):
-    global waiting_list, thread_lock
+    global thread_lock
 
+    fo = None
     with thread_lock:
+        global waiting_list
         if len(waiting_list) != 0:
             id = waiting_list.pop(0)
+            fo = FetchObject("manga", id)
         else:
             try:
                 offset = 0
                 while True:
-                    chapter = (
+                    query = (
                         ChapterModel.select()
                         .where(ChapterModel.urls.is_null())
                         .limit(1)
                         .offset(offset)
-                        .get()
                     )
+                    chapter = [i for i in query][0]
 
-                    found = False
-                    for i in failed:
-                        if i[0] == chapter.manga.id and i[1] == chapter.id:
-                            found = True
-                            break
-
-                    if not found:
-                        id = [chapter.manga.id, chapter.id, chapter.manga.extra_data]
+                    if not any(
+                        i[0] == chapter.manga.id and i[1] == chapter.id for i in failed
+                    ):
+                        id = (chapter.manga.id, chapter.id, chapter.manga.extra_data)
+                        fo = FetchObject("chapter", id)
                         break
 
                     offset += 1
-            except KeyboardInterrupt:
-                id = None
+            except:
+                pass
 
-    result = None
-    if id != None:
-        if isinstance(id, list):
-            print(f"Fetching: {id[1]} from {id[0]}")
-        else:
-            print(f"Fetching: {id}")
-
+    if fo is not None:
         try:
-            if isinstance(id, list):
-                result = [
-                    id[0],
-                    id[1],
-                    driver.get_chapter(id[1], id[2], proxy),
-                ]
-            else:
-                result = driver.get(id, proxy)
+            fo.fetch(proxy)
         except:
-            error(id)
+            fo.error()
 
-    return result
+    return fo
 
 
 counter = 300
@@ -213,15 +243,8 @@ while True:
 
             for future in concurrent.futures.as_completed(futures):
                 result = future.result()
-                try:
-                    if result != None:
-                        if isinstance(result, Manga):
-                            save_manga(result)
-                        else:
-                            save_chapter(result[0], result[1], result[2])
-                except:
-                    if isinstance(result, Manga):
-                        error(result.id)
+                if result is not None:
+                    result.save()
 
     save_state()
     print("sleeping...")
