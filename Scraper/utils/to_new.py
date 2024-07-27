@@ -34,7 +34,7 @@ for row in result:
         description=row[3],
         is_ended=row[4] == 1,
         authors=row[5].split("|"),
-        categories=row[6].split("|"),
+        genres=row[6].split("|"),
         latest=row[7],
         update_time=row[8],
         chapters=Chapters(extra=[], serial=[], extra_data=row[10]),

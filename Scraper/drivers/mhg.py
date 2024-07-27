@@ -69,27 +69,27 @@ class MHG(Driver):
     identifier = "MHG"
     timeout = 10
     initId = 1
-    categories = {
-        "rexue": Manga.categories_list[0],
-        "aiqing": Manga.categories_list[1],
-        "xiaoyuan": Manga.categories_list[2],
-        "baihe": Manga.categories_list[3],
-        "danmei": Manga.categories_list[4],
-        "maoxian": Manga.categories_list[5],
-        "hougong": Manga.categories_list[6],
-        "kehuan": Manga.categories_list[7],
-        "zhanzheng": Manga.categories_list[8],
-        "xuanyi": Manga.categories_list[9],
-        "tuili": Manga.categories_list[10],
-        "gaoxiao": Manga.categories_list[11],
-        "mohuan": Manga.categories_list[12],
-        "mofa": Manga.categories_list[13],
-        "kongbu": Manga.categories_list[14],
-        "shengui": Manga.categories_list[15],
-        "lishi": Manga.categories_list[16],
-        "jingji": Manga.categories_list[18],
-        "jizhan": Manga.categories_list[20],
-        "weiniang": Manga.categories_list[22],
+    genres = {
+        "rexue": Manga.genres_list[0],
+        "aiqing": Manga.genres_list[1],
+        "xiaoyuan": Manga.genres_list[2],
+        "baihe": Manga.genres_list[3],
+        "danmei": Manga.genres_list[4],
+        "maoxian": Manga.genres_list[5],
+        "hougong": Manga.genres_list[6],
+        "kehuan": Manga.genres_list[7],
+        "zhanzheng": Manga.genres_list[8],
+        "xuanyi": Manga.genres_list[9],
+        "tuili": Manga.genres_list[10],
+        "gaoxiao": Manga.genres_list[11],
+        "mohuan": Manga.genres_list[12],
+        "mofa": Manga.genres_list[13],
+        "kongbu": Manga.genres_list[14],
+        "shengui": Manga.genres_list[15],
+        "lishi": Manga.genres_list[16],
+        "jingji": Manga.genres_list[18],
+        "jizhan": Manga.genres_list[20],
+        "weiniang": Manga.genres_list[22],
     }
 
     def get(self, id: int, proxy: str):
@@ -110,10 +110,10 @@ class MHG(Driver):
 
         title = soup.find("div", class_="book-title").find("h1").text.strip()
         info = soup.find("ul", class_="detail-list cf").find_all("li")
-        categories = [
-            MHG.categories[i["href"][6:-1]]
+        genres = [
+            MHG.genres[i["href"][6:-1]]
             for i in info[1].find("span").find_all("a")
-            if i["href"][6:-1] in MHG.categories.keys()
+            if i["href"][6:-1] in MHG.genres.keys()
         ]
         authors = [i.text.strip() for i in info[1].find_all("span")[1].find_all("a")]
         description = soup.find("div", id="intro-cut").text.strip()
@@ -157,7 +157,7 @@ class MHG(Driver):
             authors=authors,
             description=description,
             is_ended=is_ended,
-            categories=categories,
+            genres=genres,
             update_time=time.time(),
         )
 

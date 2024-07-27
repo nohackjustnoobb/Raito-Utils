@@ -5,7 +5,7 @@ from peewee import *
 class MangaModel(Model):
     id = CharField(column_name="ID", primary_key=True)
     authors = CharField(column_name="AUTHORS")
-    categories = CharField(column_name="CATEGORIES")
+    genres = CharField(column_name="GENRES")
     description = TextField(column_name="DESCRIPTION")
     is_ended = BooleanField(column_name="IS_ENDED")
     latest = CharField(column_name="LATEST")
@@ -52,9 +52,9 @@ class PreviewManga:
 
 @dataclass
 class Manga:
-    categories_list = [
-        "Passionate",
-        "Love",
+    genres_list = [
+        "HotBlooded",
+        "Romance",
         "Campus",
         "Yuri",
         "BL",
@@ -69,7 +69,7 @@ class Manga:
         "Magic",
         "Horror",
         "Ghosts",
-        "History",
+        "Historical",
         "FanFi",
         "Sports",
         "Hentai",
@@ -83,7 +83,7 @@ class Manga:
     description: str
     is_ended: bool
     authors: list
-    categories: tuple
+    genres: tuple
     chapters: Chapters
     latest: str
     update_time: int
@@ -100,7 +100,7 @@ class Manga:
         model.update_time = self.update_time
         model.extra_data = self.chapters.extra_data
         model.authors = "|".join(self.authors)
-        model.categories = "|".join(self.categories)
+        model.genres = "|".join(self.genres)
 
         return model
 
