@@ -1,25 +1,6 @@
 {
-    // Required, the driver used to fetch the data
-    "driver": "driverID",
-    // Required, the proxies used to fetch the data, at least one
+    "driver": "id",
     "proxies": [
-        "proxyIP"
-    ],
-    // Optional, the mode of the application
-    // Possible values: "all", "update"
-    // Default: "all"
-    // For "all", it will fetch all manga one by one
-    // For "update", it will fetch the manga which is outdated
-    "mode": "all",
-    // Optional, the database configuration
-    "database": {
-        // Possible values: "sqlite3", "postgres", "mysql"
-        // Default: "sqlite3"
-        "sql": "sqlite3",
-        "connection": {
-            // Optional, only for "sqlite3"
-            // Default: "./data/{driverID}.sqlite3"
-            "path": "./data/{driverID}.sqlite3"
-        }
-    }
+        "https://proxy.example.com"
+    ]
 }

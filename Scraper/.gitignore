@@ -1,6 +1,9 @@
-.venv
-config.json
+node_modules
+# Keep environment variables out of version control
+.env
+
 data
 
-**.sqlite3
-**/__pycache__
+config.json
+
+build

@@ -1,10 +1,10 @@
-version: "3"
+version: '3'
 
 services:
   scraper:
     build:
       context: .
-    restart: unless-stopped
     volumes:
-      - ./config.json:/app/config.json
       - ./data:/app/data
+      - ./config.json:/app/config.json
+    restart: unless-stopped

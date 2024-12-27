@@ -1,0 +1,43 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../data/db.sqlite3"
+}
+
+model WaitingManga {
+  id    String @id
+  tries Int    @default(0)
+}
+
+model Manga {
+  id          String    @id
+  title       String
+  authors     String
+  genres      String
+  description String
+  is_ended    Boolean
+  latest      String
+  thumbnail   String
+  update_time Int
+  extra_data  String
+  chapters    Chapter[]
+}
+
+model Chapter {
+  manga    Manga   @relation(fields: [manga_id], references: [id])
+  manga_id String
+  id       String
+  idx      Int
+  is_extra Boolean
+  title    String
+  urls     String?
+  tries    Int     @default(0)
+
+  @@id([manga_id, id])
+}
