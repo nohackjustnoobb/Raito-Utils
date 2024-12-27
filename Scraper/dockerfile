@@ -10,4 +10,4 @@ RUN yarn prisma generate
 
 RUN yarn build
 
-CMD ["yarn", "start"]
+CMD ["sh", "-c", "yarn prisma migrate dev --name init && yarn start"]
