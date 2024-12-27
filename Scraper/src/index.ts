@@ -45,7 +45,6 @@ async function main() {
     await sleep_(timeout);
   };
 
-  // TODO not tested
   async function checkAndFixMissing() {
     logger.info("Checking missing...");
 
@@ -82,7 +81,7 @@ async function main() {
     let counter = 0;
     while (dbTotal < total) {
       // Check if reached the end
-      if ((counter + 1) * drivers[0].numPerPage >= total)
+      if (counter * drivers[0].numPerPage >= total)
         throw new Error("Failed to fix missing");
 
       await sleep(timeout);
